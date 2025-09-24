@@ -27,11 +27,16 @@ export default function Skills({
       { threshold: 0.2 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    const currentSection = sectionRef.current;
+    if (currentSection) {
+      observer.observe(currentSection);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      if (currentSection) {
+        observer.unobserve(currentSection);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -45,9 +50,14 @@ export default function Skills({
       }
     };
 
-    if (sectionRef.current) {
-      sectionRef.current.addEventListener('mousemove', handleMouseMove);
-      return () => sectionRef.current?.removeEventListener('mousemove', handleMouseMove);
+    const currentSection = sectionRef.current;
+    if (currentSection) {
+      currentSection.addEventListener('mousemove', handleMouseMove);
+      return () => {
+        if (currentSection) {
+          currentSection.removeEventListener('mousemove', handleMouseMove);
+        }
+      };
     }
   }, []);
 

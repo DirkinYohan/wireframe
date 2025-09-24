@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Github, ExternalLink, Code2, Sparkles, ChevronLeft, ChevronRight, Zap, Globe, Play } from "lucide-react";
+import { Github, Sparkles, ChevronLeft, ChevronRight, Globe, Play } from "lucide-react";
 
 type Lang = "es" | "en";
 
@@ -87,11 +87,16 @@ export default function ProjectsCarousel({
       { threshold: 0.2 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    const currentSection = sectionRef.current;
+    if (currentSection) {
+      observer.observe(currentSection);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      if (currentSection) {
+        observer.unobserve(currentSection);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -105,9 +110,14 @@ export default function ProjectsCarousel({
       }
     };
 
-    if (sectionRef.current) {
-      sectionRef.current.addEventListener('mousemove', handleMouseMove);
-      return () => sectionRef.current?.removeEventListener('mousemove', handleMouseMove);
+    const currentSection = sectionRef.current;
+    if (currentSection) {
+      currentSection.addEventListener('mousemove', handleMouseMove);
+      return () => {
+        if (currentSection) {
+          currentSection.removeEventListener('mousemove', handleMouseMove);
+        }
+      };
     }
   }, []);
 

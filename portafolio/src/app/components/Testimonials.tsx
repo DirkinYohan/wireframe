@@ -57,8 +57,44 @@ const useTestimonialsData = (lang: "es" | "en") => {
   ];
 };
 
+// Definir interfaces específicas para los tipos
+interface TestimonialData {
+  name: string;
+  company: string;
+  avatar: string;
+  role: {
+    es: string;
+    en: string;
+  };
+  message: {
+    es: string;
+    en: string;
+  };
+  rating: number;
+  project: string;
+  gradient: string;
+}
+
+interface TestimonialCardProps {
+  testimonial: TestimonialData;
+  index: number;
+  isVisible: boolean;
+  activeCard: number | null;
+  setActiveCard: (index: number | null) => void;
+  darkMode: boolean;
+  lang: "es" | "en";
+}
+
 // Componente para tarjeta de testimonio
-const TestimonialCard = ({ testimonial, index, isVisible, activeCard, setActiveCard, darkMode, lang }: any) => (
+const TestimonialCard = ({ 
+  testimonial, 
+  index, 
+  isVisible, 
+  activeCard, 
+  setActiveCard, 
+  darkMode, 
+  lang 
+}: TestimonialCardProps) => (
   <div
     className={`group relative transition-all duration-700 ${
       isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
@@ -193,11 +229,16 @@ export default function Testimonials({
       { threshold: 0.2 }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    const currentSection = sectionRef.current;
+    if (currentSection) {
+      observer.observe(currentSection);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      if (currentSection) {
+        observer.unobserve(currentSection);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -211,9 +252,14 @@ export default function Testimonials({
       }
     };
 
-    if (sectionRef.current) {
-      sectionRef.current.addEventListener('mousemove', handleMouseMove);
-      return () => sectionRef.current?.removeEventListener('mousemove', handleMouseMove);
+    const currentSection = sectionRef.current;
+    if (currentSection) {
+      currentSection.addEventListener('mousemove', handleMouseMove);
+      return () => {
+        if (currentSection) {
+          currentSection.removeEventListener('mousemove', handleMouseMove);
+        }
+      };
     }
   }, []);
 
